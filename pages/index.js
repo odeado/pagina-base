@@ -3,6 +3,20 @@ import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Head from "next/head";
 
+
+useEffect(() => {
+  const testConnection = async () => {
+    try {
+      const testDoc = await getDocs(collection(db, "test_connection"));
+      console.log("Conexión exitosa:", testDoc);
+    } catch (error) {
+      console.error("Error de conexión:", error);
+    }
+  };
+  testConnection();
+}, []);
+
+
 export default function PublicPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
