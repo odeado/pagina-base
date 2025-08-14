@@ -1,51 +1,87 @@
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import styles from "../../styles/AdminPanel.module.css";
 
 export default function AdminPanel() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [imageBase64, setImageBase64] = useState("");
-  const [posts, setPosts] = useState([]);
+  const [section, setSection] = useState({
+    title: "",
+    content: "",
+    backgroundColor: "#ffffff",
+    textColor: "#333333",
+    image: "",
+    gallery: []
+  });
+  const [galleryImage, setGalleryImage] = useState("");
+  const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size > 500000) { // Límite de 500KB
+    if (file && file.size > 500000) {
       alert("La imagen debe ser menor a 500KB");
       return;
     }
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageBase64(reader.result);
+        setSection({...section, image: reader.result});
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const savePost = async () => {
-    if (!title || !content) {
-      alert("Título y contenido son requeridos");
+  const handleGalleryImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 500000) {
+      alert("La imagen debe ser menor a 500KB");
+      return;
+    }
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGalleryImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addGalleryImage = () => {
+    if (galleryImage) {
+      setSection({
+        ...section,
+        gallery: [...section.gallery, { url: galleryImage, alt: "" }]
+      });
+      setGalleryImage("");
+    }
+  };
+
+  const saveSection = async () => {
+    if (!section.title) {
+      alert("El título es requerido");
       return;
     }
     
     setLoading(true);
     try {
-      await addDoc(collection(db, "posts"), {
-        title,
-        content,
-        imageBase64,
+      await addDoc(collection(db, "pageSections"), {
+        ...section,
         createdAt: new Date()
       });
       
-      setTitle("");
-      setContent("");
-      setImageBase64("");
-      fetchPosts();
+      // Reset form
+      setSection({
+        title: "",
+        content: "",
+        backgroundColor: "#ffffff",
+        textColor: "#333333",
+        image: "",
+        gallery: []
+      });
+      fetchSections();
     } catch (error) {
       console.error("Error:", error);
       alert("Error al guardar");
@@ -54,15 +90,29 @@ export default function AdminPanel() {
     }
   };
 
-  const fetchPosts = async () => {
+  const deleteSection = async (id) => {
+    if (confirm("¿Estás seguro de eliminar esta sección?")) {
+      try {
+        await deleteDoc(doc(db, "pageSections", id));
+        fetchSections();
+      } catch (error) {
+        console.error("Error eliminando:", error);
+      }
+    }
+  };
+
+  const fetchSections = async () => {
     setLoading(true);
     try {
-      const querySnapshot = await getDocs(collection(db, "posts"));
+      const querySnapshot = await getDocs(collection(db, "pageSections"));
       const data = querySnapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data() 
       }));
-      setPosts(data);
+      // Ordenar por fecha de creación
+      setSections(data.sort((a, b) => 
+        a.createdAt?.toDate() - b.createdAt?.toDate()
+      ));
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -71,85 +121,83 @@ export default function AdminPanel() {
   };
 
   useEffect(() => { 
-    fetchPosts(); 
+    fetchSections(); 
   }, []);
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+    <div className={styles.adminContainer}>
       <Head>
-        <title>Panel Administrativo</title>
+        <title>Constructor de Páginas - Admin</title>
       </Head>
       
       <button 
         onClick={() => router.push('/')}
-        style={{ marginBottom: '20px' }}
+        className={styles.viewButton}
       >
         Ver Página Pública
       </button>
 
-      <h1>Panel Administrativo</h1>
+      <h1 className={styles.adminTitle}>Constructor de Páginas</h1>
       
-      <div style={{ 
-        backgroundColor: '#f5f5f5',
-        padding: '20px',
-        borderRadius: '8px',
-        marginBottom: '30px'
-      }}>
-        <h2>Nuevo Post</h2>
+      <div className={styles.formContainer}>
+        <h2>Nueva Sección</h2>
         
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Título:</label>
+        <div className={styles.formGroup}>
+          <label>Título de la sección:</label>
           <input
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+            value={section.title}
+            onChange={(e) => setSection({...section, title: e.target.value})}
           />
         </div>
         
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Contenido:</label>
+        <div className={styles.formGroup}>
+          <label>Contenido (puede usar múltiples líneas):</label>
           <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            style={{ 
-              width: '100%', 
-              padding: '10px', 
-              minHeight: '150px',
-              borderRadius: '4px',
-              border: '1px solid #ddd'
-            }}
+            value={section.content}
+            onChange={(e) => setSection({...section, content: e.target.value})}
+            rows={5}
           />
         </div>
         
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Imagen:</label>
+        <div className={styles.colorGroup}>
+          <div className={styles.colorInput}>
+            <label>Color de fondo:</label>
+            <input
+              type="color"
+              value={section.backgroundColor}
+              onChange={(e) => setSection({...section, backgroundColor: e.target.value})}
+            />
+            <span>{section.backgroundColor}</span>
+          </div>
+          
+          <div className={styles.colorInput}>
+            <label>Color de texto:</label>
+            <input
+              type="color"
+              value={section.textColor}
+              onChange={(e) => setSection({...section, textColor: e.target.value})}
+            />
+            <span>{section.textColor}</span>
+          </div>
+        </div>
+        
+        <div className={styles.formGroup}>
+          <label>Imagen principal:</label>
           <input
             type="file"
             onChange={handleImageChange}
             accept="image/*"
           />
-          {imageBase64 && (
-            <div style={{ marginTop: '10px' }}>
+          {section.image && (
+            <div className={styles.imagePreview}>
               <img 
-                src={imageBase64} 
+                src={section.image} 
                 alt="Preview" 
-                style={{ 
-                  maxWidth: '200px',
-                  maxHeight: '200px',
-                  borderRadius: '4px'
-                }} 
               />
               <button 
-                onClick={() => setImageBase64("")}
-                style={{ 
-                  display: 'block',
-                  marginTop: '5px',
-                  color: 'red',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer'
-                }}
+                onClick={() => setSection({...section, image: ""})}
+                className={styles.removeButton}
               >
                 Eliminar imagen
               </button>
@@ -157,54 +205,88 @@ export default function AdminPanel() {
           )}
         </div>
         
+        <div className={styles.formGroup}>
+          <label>Galería de imágenes:</label>
+          <div className={styles.galleryControls}>
+            <input
+              type="file"
+              onChange={handleGalleryImageChange}
+              accept="image/*"
+            />
+            <button 
+              onClick={addGalleryImage}
+              disabled={!galleryImage}
+              className={styles.addButton}
+            >
+              Agregar a galería
+            </button>
+          </div>
+          
+          {section.gallery.length > 0 && (
+            <div className={styles.galleryPreview}>
+              {section.gallery.map((img, index) => (
+                <div key={index} className={styles.galleryItem}>
+                  <img src={img.url} alt={`Preview ${index}`} />
+                  <button
+                    onClick={() => setSection({
+                      ...section,
+                      gallery: section.gallery.filter((_, i) => i !== index)
+                    })}
+                    className={styles.removeSmallButton}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
         <button 
-          onClick={savePost} 
+          onClick={saveSection}
           disabled={loading}
-          style={{ 
-            padding: '10px 20px',
-            background: loading ? '#ccc' : '#0070f3',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          className={styles.saveButton}
         >
-          {loading ? "Guardando..." : "Publicar Post"}
+          {loading ? "Guardando..." : "Guardar Sección"}
         </button>
       </div>
 
-      <div>
-        <h2>Posts Existentes ({posts.length})</h2>
+      <div className={styles.sectionsList}>
+        <h2>Secciones Existentes ({sections.length})</h2>
         
-        {loading && posts.length === 0 ? (
-          <p>Cargando posts...</p>
+        {loading && sections.length === 0 ? (
+          <p>Cargando secciones...</p>
         ) : (
-          <div style={{ display: 'grid', gap: '15px' }}>
-            {posts.map(post => (
+          <div className={styles.sectionsGrid}>
+            {sections.map(sec => (
               <div 
-                key={post.id}
-                style={{ 
-                  border: '1px solid #eee',
-                  borderRadius: '8px',
-                  padding: '15px'
+                key={sec.id}
+                className={styles.sectionCard}
+                style={{
+                  backgroundColor: sec.backgroundColor || '#ffffff',
+                  color: sec.textColor || '#333333'
                 }}
               >
-                <h3>{post.title}</h3>
-                {post.imageBase64 && (
+                <h3>{sec.title}</h3>
+                {sec.image && (
                   <img 
-                    src={post.imageBase64} 
-                    alt={post.title}
-                    style={{ 
-                      maxWidth: '200px',
-                      margin: '10px 0',
-                      borderRadius: '4px'
-                    }} 
+                    src={sec.image} 
+                    alt="Sección"
+                    className={styles.sectionImage}
                   />
                 )}
-                <p>{post.content}</p>
-                <small style={{ color: '#666' }}>
-                  {post.createdAt?.toDate()?.toLocaleString()}
-                </small>
+                <p>{sec.content?.split('\n')[0]}...</p>
+                <div className={styles.sectionActions}>
+                  <small>
+                    {sec.createdAt?.toDate()?.toLocaleString()}
+                  </small>
+                  <button 
+                    onClick={() => deleteSection(sec.id)}
+                    className={styles.deleteButton}
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </div>
             ))}
           </div>
