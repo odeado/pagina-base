@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Head from "next/head";
-
-
-
-
+import styles from "../styles/PublicPage.module.css";
 
 export default function PublicPage() {
   const [posts, setPosts] = useState([]);
@@ -31,40 +28,37 @@ export default function PublicPage() {
   }, []);
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+    <div className={styles.container}>
       <Head>
-        <title>Mi Blog Público</title>
+        <title>Mi Blog Público | Comparte tus ideas</title>
+        <meta name="description" content="Blog personal con artículos sobre tecnología y desarrollo web" />
       </Head>
       
-      <h1>Últimos Posts</h1>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Explora Nuestros Artículos</h1>
+        <p className={styles.subtitle}>Descubre las últimas publicaciones de nuestra comunidad</p>
+      </header>
       
       {loading ? (
-        <p>Cargando...</p>
+        <div className={styles.loading}>Cargando artículos...</div>
       ) : (
-        <div style={{ display: 'grid', gap: '20px' }}>
+        <div className={styles.postsGrid}>
           {posts.map(post => (
-            <article key={post.id} style={{ 
-              border: '1px solid #eee',
-              borderRadius: '8px',
-              padding: '20px'
-            }}>
+            <article key={post.id} className={styles.postCard}>
               {post.imageBase64 && (
                 <img 
                   src={post.imageBase64} 
                   alt={post.title}
-                  style={{ 
-                    width: '100%', 
-                    height: '300px',
-                    objectFit: 'cover',
-                    borderRadius: '4px'
-                  }}
+                  className={styles.postImage}
                 />
               )}
-              <h2>{post.title}</h2>
-              <p style={{ color: '#666' }}>{post.content}</p>
-              <small>
-                {post.createdAt?.toDate()?.toLocaleDateString()}
-              </small>
+              <div className={styles.postContent}>
+                <h2 className={styles.postTitle}>{post.title}</h2>
+                <p className={styles.postText}>{post.content}</p>
+                <div className={styles.postDate}>
+                  Publicado el: {post.createdAt?.toDate()?.toLocaleDateString()}
+                </div>
+              </div>
             </article>
           ))}
         </div>
