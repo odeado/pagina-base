@@ -1,12 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true, // Opcional para evitar errores de ESLint
+  images: {
+    domains: ['firebasestorage.googleapis.com'],
   },
-  typescript: {
-    ignoreBuildErrors: true, // Opcional si usas TypeScript
-  }
 };
 
 module.exports = nextConfig;
