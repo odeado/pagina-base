@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Home from './components/Home';
 import PublicPage from './components/PublicPage';
 
