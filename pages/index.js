@@ -2,66 +2,87 @@ import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Head from "next/head";
-import styles from "../styles/PublicPage.module.css";
+import styles from "../styles/PageBuilder.module.css"; // Cambié el nombre del CSS
 
-export default function PublicPage() {
-  const [posts, setPosts] = useState([]);
+export default function BuiltPage() {
+  const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPosts = async () => {
+  const fetchSections = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "posts"));
+      const querySnapshot = await getDocs(collection(db, "pageSections")); // Cambiado a pageSections
       const data = querySnapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data() 
       }));
-      setPosts(data);
+      setSections(data);
     } catch (error) {
-      console.error("Error al cargar posts:", error);
+      console.error("Error al cargar secciones:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => { 
-    fetchPosts(); 
+    fetchSections(); 
   }, []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.pageContainer}>
       <Head>
-        <title>Mi Blog Público | Comparte tus ideas</title>
-        <meta name="description" content="Blog personal con artículos sobre tecnología y desarrollo web" />
+        <title>Mi Página Personalizada</title>
+        <meta name="description" content="Página construida dinámicamente" />
       </Head>
       
-      <header className={styles.header}>
-        <h1 className={styles.title}>Explora Nuestros Artículos</h1>
-        <p className={styles.subtitle}>Descubre las últimas publicaciones de nuestra comunidad</p>
-      </header>
-      
       {loading ? (
-        <div className={styles.loading}>Cargando artículos...</div>
+        <div className={styles.loading}>Cargando página...</div>
       ) : (
-        <div className={styles.postsGrid}>
-          {posts.map(post => (
-            <article key={post.id} className={styles.postCard}>
-              {post.imageBase64 && (
+        sections.map(section => (
+          <section 
+            key={section.id} 
+            className={styles.pageSection}
+            style={{ 
+              backgroundColor: section.backgroundColor || '#ffffff',
+              backgroundImage: section.backgroundImage ? `url(${section.backgroundImage})` : 'none',
+              color: section.textColor || '#333333'
+            }}
+          >
+            <div className={styles.sectionContent}>
+              {section.title && (
+                <h2 className={styles.sectionTitle}>{section.title}</h2>
+              )}
+              
+              {section.image && (
                 <img 
-                  src={post.imageBase64} 
-                  alt={post.title}
-                  className={styles.postImage}
+                  src={section.image} 
+                  alt={section.imageAlt || ''}
+                  className={styles.sectionImage}
                 />
               )}
-              <div className={styles.postContent}>
-                <h2 className={styles.postTitle}>{post.title}</h2>
-                <p className={styles.postText}>{post.content}</p>
-                <div className={styles.postDate}>
-                  Publicado el: {post.createdAt?.toDate()?.toLocaleDateString()}
+              
+              {section.content && (
+                <div className={styles.sectionText}>
+                  {section.content.split('\n').map((paragraph, i) => (
+                    <p key={i}>{paragraph}</p>
+                  ))}
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              )}
+              
+              {section.gallery && section.gallery.length > 0 && (
+                <div className={styles.gallery}>
+                  {section.gallery.map((img, index) => (
+                    <img 
+                      key={index}
+                      src={img.url} 
+                      alt={img.alt || `Imagen ${index + 1}`}
+                      className={styles.galleryImage}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        ))
       )}
     </div>
   );
