@@ -19,6 +19,49 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [editingId, setEditingId] = useState(null);
+  const [logo, setLogo] = useState("");
+  const [logoLoading, setLogoLoading] = useState(false);
+
+
+  // Función para manejar el cambio de logo
+const handleLogoChange = (e) => {
+  const file = e.target.files[0];
+  if (file && file.size > 500000) {
+    alert("El logo debe ser menor a 500KB");
+    return;
+  }
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogo(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+// Función para guardar el logo
+const saveLogo = async () => {
+  if (!logo) {
+    alert("Debes seleccionar un logo primero");
+    return;
+  }
+  
+  setLogoLoading(true);
+  try {
+    // Guardamos el logo en una colección especial
+    await addDoc(collection(db, "siteSettings"), {
+      type: "logo",
+      image: logo,
+      createdAt: new Date()
+    });
+    alert("Logo guardado correctamente");
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al guardar el logo");
+  } finally {
+    setLogoLoading(false);
+  }
+};
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -286,7 +329,7 @@ const cancelEdit = () => {
           disabled={loading}
           className={styles.saveButton}
         >
-          {loading ? "Guardando..." : "Guardar Sección"}
+          {loading ? "Guardando..." : editingId ? "Actualizar Sección" : "Guardar Sección"}
         </button>
 
 
@@ -338,7 +381,6 @@ const cancelEdit = () => {
                     >
                       Editar
                     </button>
-                  </div>
                   <button 
                     onClick={() => deleteSection(sec.id)}
                     className={styles.deleteButton}
@@ -346,6 +388,7 @@ const cancelEdit = () => {
                     Eliminar
                   </button>
                 </div>
+              </div>
               </div>
             ))}
           </div>
