@@ -246,6 +246,41 @@
   font-size: 14px;
 }
 
+/* Logo Section */
+.logoSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+/* Menu Section */
+.menuSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.pagesList {
+  margin-top: 1rem;
+}
+
+.pagesList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pagesList li {
+  padding: 0.5rem;
+  background: white;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
   .colorGroup {
     flex-direction: column;

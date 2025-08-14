@@ -6,6 +6,8 @@ import styles from "../styles/PageBuilder.module.css"; // Cambié el nombre del 
 
 export default function BuiltPage() {
   const [sections, setSections] = useState([]);
+  const [logo, setLogo] = useState("");
+  const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchSections = async () => {
@@ -27,8 +29,46 @@ export default function BuiltPage() {
     fetchSections(); 
   }, []);
 
+   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Obtener el logo
+        const logoSnapshot = await getDocs(collection(db, "siteSettings"));
+        logoSnapshot.forEach(doc => {
+          if (doc.data().type === "logo") {
+            setLogo(doc.data().image);
+          }
+        });
+
+        // Obtener el menú
+        const menuSnapshot = await getDocs(collection(db, "pages"));
+        setMenuItems(menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className={styles.pageContainer}>
+      <header>
+        {logo && <img src={logo} alt="Site Logo" className="logo" />}
+        <nav>
+          <ul>
+            {menuItems.map(item => (
+              <li key={item.id}>
+                <a href={item.path}>{item.title}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
       <Head>
         <title>Mi Página Personalizada</title>
         <meta name="description" content="Página construida dinámicamente" />

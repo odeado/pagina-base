@@ -23,6 +23,56 @@ export default function AdminPanel() {
   const [logoLoading, setLogoLoading] = useState(false);
 
 
+
+// Estados para el menú
+const [pages, setPages] = useState([]);
+const [newPage, setNewPage] = useState({
+  title: "",
+  path: "",
+  isMain: false
+});
+
+// Función para cargar las páginas existentes
+const fetchPages = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "pages"));
+    const data = querySnapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...doc.data() 
+    }));
+    setPages(data);
+  } catch (error) {
+    console.error("Error cargando páginas:", error);
+  }
+};
+
+// Función para agregar nueva página al menú
+const addPage = async () => {
+  if (!newPage.title || !newPage.path) {
+    alert("Título y path son requeridos");
+    return;
+  }
+  
+  try {
+    await addDoc(collection(db, "pages"), {
+      ...newPage,
+      createdAt: new Date()
+    });
+    setNewPage({ title: "", path: "", isMain: false });
+    fetchPages();
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al guardar página");
+  }
+};
+
+// Cargar páginas al montar el componente
+useEffect(() => { 
+  fetchSections();
+  fetchPages();
+}, []);
+
+
   // Función para manejar el cambio de logo
 const handleLogoChange = (e) => {
   const file = e.target.files[0];
@@ -220,6 +270,101 @@ const cancelEdit = () => {
       </button>
 
       <h1 className={styles.adminTitle}>Constructor de Páginas</h1>
+
+
+{/* Sección del Logo */}
+<div className={styles.logoSection}>
+  <h2>Logo del Sitio</h2>
+  <div className={styles.formGroup}>
+    <label>Subir Logo:</label>
+    <input
+      type="file"
+      onChange={handleLogoChange}
+      accept="image/*"
+    />
+    {logo && (
+      <div className={styles.imagePreview}>
+        <img src={logo} alt="Logo Preview" />
+      </div>
+    )}
+    <button 
+      onClick={saveLogo}
+      disabled={!logo || logoLoading}
+      className={styles.saveButton}
+    >
+      {logoLoading ? "Guardando..." : "Guardar Logo"}
+    </button>
+  </div>
+</div>
+
+{/* Sección del Menú */}
+<div className={styles.menuSection}>
+  <h2>Menú de Navegación</h2>
+  <div className={styles.formGroup}>
+    <label>Título de la página:</label>
+    <input
+      type="text"
+      value={newPage.title}
+      onChange={(e) => setNewPage({...newPage, title: e.target.value})}
+    />
+  </div>
+  <div className={styles.formGroup}>
+    <label>Path (ej: /about):</label>
+    <input
+      type="text"
+      value={newPage.path}
+      onChange={(e) => setNewPage({...newPage, path: e.target.value})}
+    />
+  </div>
+  <div className={styles.formGroup}>
+    <label>
+      <input
+        type="checkbox"
+        checked={newPage.isMain}
+        onChange={(e) => setNewPage({...newPage, isMain: e.target.checked})}
+      />
+      ¿Menú principal?
+    </label>
+  </div>
+  <button onClick={addPage} className={styles.saveButton}>
+    Agregar al Menú
+  </button>
+
+  {pages.length > 0 && (
+    <div className={styles.pagesList}>
+      <h3>Páginas existentes:</h3>
+      <ul>
+        {pages.map(page => (
+          <li key={page.id}>
+            {page.title} - {page.path} 
+            {page.isMain && " (Principal)"}
+            <button 
+              onClick={() => deleteDoc(doc(db, "pages", page.id))}
+              className={styles.deleteButton}
+            >
+              Eliminar
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       
       <div className={styles.formContainer}>
         <h2>Nueva Sección</h2>
