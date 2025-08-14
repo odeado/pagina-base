@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import styles from "../../styles/AdminPanel.module.css";
@@ -18,6 +18,7 @@ export default function AdminPanel() {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [editingId, setEditingId] = useState(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -67,11 +68,21 @@ export default function AdminPanel() {
     
     setLoading(true);
     try {
-      await addDoc(collection(db, "pageSections"), {
-        ...section,
-        createdAt: new Date()
-      });
-      
+      if (editingId) {
+        // Modo edición - actualizar documento existente
+        await updateDoc(doc(db, "pageSections", editingId), {
+          ...section,
+          updatedAt: new Date()
+        });
+        setEditingId(null); // Salir del modo edición
+      } else {
+        // Modo creación - agregar nuevo documento
+        await addDoc(collection(db, "pageSections"), {
+          ...section,
+          createdAt: new Date()
+        });
+      }
+
       // Reset form
       setSection({
         title: "",
@@ -89,6 +100,34 @@ export default function AdminPanel() {
       setLoading(false);
     }
   };
+
+  const loadSectionForEdit = (id) => {
+  const sectionToEdit = sections.find(sec => sec.id === id);
+  if (sectionToEdit) {
+    setSection({
+      title: sectionToEdit.title,
+      content: sectionToEdit.content,
+      backgroundColor: sectionToEdit.backgroundColor || "#ffffff",
+      textColor: sectionToEdit.textColor || "#333333",
+      image: sectionToEdit.image || "",
+      gallery: sectionToEdit.gallery || []
+    });
+    setEditingId(id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
+
+const cancelEdit = () => {
+  setEditingId(null);
+  setSection({
+    title: "",
+    content: "",
+    backgroundColor: "#ffffff",
+    textColor: "#333333",
+    image: "",
+    gallery: []
+  });
+};
 
   const deleteSection = async (id) => {
     if (confirm("¿Estás seguro de eliminar esta sección?")) {
@@ -249,6 +288,18 @@ export default function AdminPanel() {
         >
           {loading ? "Guardando..." : "Guardar Sección"}
         </button>
+
+
+{editingId && (
+  <button 
+    onClick={cancelEdit}
+    className={styles.cancelButton}
+  >
+    Cancelar Edición
+  </button>
+)}
+
+
       </div>
 
       <div className={styles.sectionsList}>
@@ -280,6 +331,14 @@ export default function AdminPanel() {
                   <small>
                     {sec.createdAt?.toDate()?.toLocaleString()}
                   </small>
+                  <div>
+                    <button 
+                      onClick={() => loadSectionForEdit(sec.id)}
+                      className={styles.editButton}
+                    >
+                      Editar
+                    </button>
+                  </div>
                   <button 
                     onClick={() => deleteSection(sec.id)}
                     className={styles.deleteButton}
