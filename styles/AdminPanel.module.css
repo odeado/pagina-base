@@ -281,6 +281,55 @@
   align-items: center;
 }
 
+.layoutPreview {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.previewContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.previewText, .previewImage {
+  padding: 1.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewText {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.previewImage {
+  background: #fff8e1;
+  color: #ff8f00;
+  border: 1px dashed #ffc107;
+}
+
+/* Para disposiciones especiales */
+.gallery-top .previewContainer::after,
+.gallery-bottom .previewContainer::before {
+  content: "Galería";
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  background: #e8f5e9;
+  color: #2e7d32;
+  text-align: center;
+  border-radius: 4px;
+}
+
 @media (max-width: 768px) {
   .colorGroup {
     flex-direction: column;

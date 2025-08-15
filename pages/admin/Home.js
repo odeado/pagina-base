@@ -289,6 +289,18 @@ const cancelEdit = () => {
   </select>
 </div>
 
+  {/* Vista previa de disposición */}
+    <div className={styles.layoutPreview}>
+      <h4>Vista previa de disposición:</h4>
+      <div 
+        className={styles.previewContainer}
+        style={{ flexDirection: section.layout === 'image-text' ? 'row' : 'row-reverse' }}
+      >
+        <div className={styles.previewText}>Texto</div>
+        <div className={styles.previewImage}>Imagen</div>
+      </div>
+    </div>
+
 {/* Color de fondo del contenido */}
 <div className={styles.formGroup}>
   <label>Color de fondo del contenido:</label>
@@ -378,18 +390,6 @@ const cancelEdit = () => {
     </div>
   )}
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
