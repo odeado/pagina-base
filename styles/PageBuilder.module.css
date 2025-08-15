@@ -63,6 +63,57 @@
   transform: scale(1.03);
 }
 
+.header {
+  background-color: #f8f9fa;
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+}
+
+.logo {
+  height: 50px;
+  width: auto;
+  position: absolute;
+  left: 2rem;
+}
+
+.siteTitle {
+  margin: 0;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.navMenu ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1.5rem;
+}
+
+.navMenu li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navMenu li a:hover {
+  color: #0070f3;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .pageSection {

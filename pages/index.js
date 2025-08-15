@@ -57,22 +57,21 @@ export default function BuiltPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <header>
-        {logo && <img src={logo} alt="Site Logo" className="logo" />}
-        <nav>
-          <ul>
-            {menuItems.map(item => (
-              <li key={item.id}>
-                <a href={item.path}>{item.title}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-      <Head>
-        <title>Mi Página Personalizada</title>
-        <meta name="description" content="Página construida dinámicamente" />
-      </Head>
+    <header className={styles.header}>
+  <div className={styles.headerContent}>
+    {logo && <img src={logo} alt="Site Logo" className={styles.logo} />}
+    <h1 className={styles.siteTitle}>Mi Página Personalizada</h1>
+    <nav className={styles.navMenu}>
+      <ul>
+        {menuItems.map(item => (
+          <li key={item.id}>
+            <a href={item.path}>{item.title}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
       
       {loading ? (
         <div className={styles.loading}>Cargando página...</div>
