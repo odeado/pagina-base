@@ -139,7 +139,7 @@ export default function BuiltPage() {
               {section.gallery && section.gallery.length > 0 && (
       <div className={`
         ${styles.gallery} 
-        ${section.layout.includes('top') ? styles.galleryTop : ''}
+        ${section.layout && section.layout.includes('top') ? styles.galleryTop : ''}
       `}>
         {section.gallery.map((img, index) => (
           <img 
