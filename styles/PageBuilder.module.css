@@ -62,9 +62,6 @@
   background-color: #f8f9fa;
   padding: 1rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 .headerContent {
@@ -74,14 +71,11 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
-  position: relative;
 }
 
 .logo {
   height: 50px;
   width: auto;
-  position: absolute;
-  left: 2rem;
 }
 
 .siteTitle {
@@ -104,9 +98,26 @@
   font-weight: 500;
   transition: color 0.3s;
 }
+/* efecto hover en los enlaces del menú */
 
 .navMenu li a:hover {
   color: #0070f3;
+}
+
+.navMenu a {
+  transition: color 0.3s;
+}
+
+.navMenu a:hover {
+  color: #0070f3;
+}
+
+.logo {
+  transition: transform 0.3s;
+}
+
+.logo:hover {
+  transform: scale(1.05);
 }
 
 /* Contenedor flexible para imagen/texto */
@@ -170,5 +181,16 @@
   
   .gallery {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+   .headerContent {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .navMenu ul {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
   }
 }

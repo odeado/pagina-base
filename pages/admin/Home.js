@@ -7,6 +7,10 @@ import styles from "../../styles/AdminPanel.module.css";
 
 export default function AdminPanel() {
   const [section, setSection] = useState({
+    logo: "",
+    siteTitle: "Mi Sitio Web",  // Nuevo: título general del sitio
+    logoLoading: false,
+    settingsId: null,  // Para saber si ya existe configuración
     title: "",
     content: "",
     backgroundColor: "#ffffff",
@@ -73,6 +77,70 @@ useEffect(() => {
   fetchSections();
   fetchPages();
 }, []);
+
+
+// Cargar configuración existente
+const fetchSiteSettings = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "siteSettings"));
+    if (!querySnapshot.empty) {
+      const docData = querySnapshot.docs[0].data();
+      setSiteSettings({
+        ...docData,
+        settingsId: querySnapshot.docs[0].id,
+        logoLoading: false
+      });
+    }
+  } catch (error) {
+    console.error("Error cargando configuración:", error);
+  }
+};
+
+// Guardar o actualizar configuración
+const saveSiteSettings = async () => {
+  if (!siteSettings.logo) {
+    alert("Debes seleccionar un logo");
+    return;
+  }
+
+  setSiteSettings(prev => ({...prev, logoLoading: true}));
+  
+  try {
+    const settingsData = {
+      logo: siteSettings.logo,
+      siteTitle: siteSettings.siteTitle,
+      updatedAt: new Date()
+    };
+
+    if (siteSettings.settingsId) {
+      // Actualizar si ya existe
+      await updateDoc(doc(db, "siteSettings", siteSettings.settingsId), settingsData);
+    } else {
+      // Crear si no existe
+      const docRef = await addDoc(collection(db, "siteSettings"), settingsData);
+      setSiteSettings(prev => ({...prev, settingsId: docRef.id}));
+    }
+    
+    alert("Configuración guardada correctamente");
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al guardar configuración");
+  } finally {
+    setSiteSettings(prev => ({...prev, logoLoading: false}));
+  }
+};
+
+// Cargar configuración al inicio
+useEffect(() => { 
+  fetchSections();
+  fetchPages();
+  fetchSiteSettings();  // Nueva llamada
+}, []);
+
+
+
+
+
 
 
   // Función para manejar el cambio de logo
@@ -263,6 +331,64 @@ const cancelEdit = () => {
       <Head>
         <title>Constructor de Páginas - Admin</title>
       </Head>
+
+
+   {/* Sección de Configuración General */}
+    <div className={styles.settingsSection}>
+      <h2>Configuración General del Sitio</h2>
+      
+      <div className={styles.formGroup}>
+        <label>Título del Sitio:</label>
+        <input
+          type="text"
+          value={siteSettings.siteTitle}
+          onChange={(e) => setSiteSettings({...siteSettings, siteTitle: e.target.value})}
+        />
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>Logo del Sitio:</label>
+        <input
+          type="file"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setSiteSettings({...siteSettings, logo: reader.result});
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+          accept="image/*"
+        />
+        {siteSettings.logo && (
+          <div className={styles.imagePreview}>
+            <img src={siteSettings.logo} alt="Logo Preview" />
+            <button 
+              onClick={() => setSiteSettings({...siteSettings, logo: ""})}
+              className={styles.removeButton}
+            >
+              Eliminar logo
+            </button>
+          </div>
+        )}
+      </div>
+      
+      <button 
+        onClick={saveSiteSettings}
+        disabled={!siteSettings.logo || siteSettings.logoLoading}
+        className={styles.saveButton}
+      >
+        {siteSettings.logoLoading ? "Guardando..." : "Guardar Configuración"}
+      </button>
+    </div>
+
+
+
+
+
+
       
       <button 
         onClick={() => router.push('/')}
