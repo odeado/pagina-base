@@ -32,7 +32,7 @@
 }
 
 .sectionImage {
-  max-width: 100%;
+  max-width: 200px;
   height: auto;
   border-radius: 4px;
   margin: 1rem 0;
@@ -44,12 +44,7 @@
   margin: 1.5rem 0;
 }
 
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
-}
+
 
 .galleryImage {
   width: 100%;
@@ -112,6 +107,55 @@
 
 .navMenu li a:hover {
   color: #0070f3;
+}
+
+/* Contenedor flexible para imagen/texto */
+.flexContainer {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  width: 100%;
+}
+
+/* Para disposición imagen-texto o text-imagen */
+.flexContainer .sectionText {
+  flex: 1;
+}
+
+.flexContainer .sectionImage {
+  flex: 1;
+  max-width: 50%;
+}
+
+/* Galería */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.galleryTop {
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+/* Para disposiciones especiales */
+.imageOnly .sectionText {
+  display: none;
+}
+
+.textOnly .sectionImage {
+  display: none;
+}
+
+/* Section Content */
+.sectionContent {
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive */

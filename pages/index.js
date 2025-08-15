@@ -82,22 +82,30 @@ export default function BuiltPage() {
             className={styles.pageSection}
             style={{ 
               backgroundColor: section.backgroundColor || '#ffffff',
-              backgroundImage: section.backgroundImage ? `url(${section.backgroundImage})` : 'none',
               color: section.textColor || '#333333'
             }}
           >
-            <div className={styles.sectionContent}>
+            <div className={styles.sectionContent}
+              style={{
+                backgroundColor: section.contentBackground || 'transparent',
+              }}
+            >
+              {/* Título siempre arriba */}
               {section.title && (
                 <h2 className={styles.sectionTitle}>{section.title}</h2>
               )}
-              
-              {section.image && (
-                <img 
-                  src={section.image} 
-                  alt={section.imageAlt || ''}
-                  className={styles.sectionImage}
-                />
-              )}
+
+
+              {/* Contenido según disposición seleccionada */}
+              {section.layout === 'image-text' && (
+      <div className={styles.flexContainer}>
+        {section.image && (
+          <img 
+            src={section.image} 
+            alt={section.imageAlt || ''}
+            className={styles.sectionImage}
+          />
+        )}
               
               {section.content && (
                 <div className={styles.sectionText}>
@@ -106,15 +114,39 @@ export default function BuiltPage() {
                   ))}
                 </div>
               )}
-              
+              </div>
+              )}
+
+              {section.layout === 'text-image' && (
+      <div className={styles.flexContainer}>
+        {section.content && (
+          <div className={styles.sectionText}>
+            {section.content.split('\n').map((paragraph, i) => (
+              <p key={i}>{paragraph}</p>
+            ))}
+          </div>
+        )}
+        {section.image && (
+          <img 
+            src={section.image} 
+            alt={section.imageAlt || ''}
+            className={styles.sectionImage}
+          />
+        )}
+      </div>
+    )}
+               {/* Galería (puede aparecer arriba o abajo según layout) */}
               {section.gallery && section.gallery.length > 0 && (
-                <div className={styles.gallery}>
-                  {section.gallery.map((img, index) => (
-                    <img 
-                      key={index}
-                      src={img.url} 
-                      alt={img.alt || `Imagen ${index + 1}`}
-                      className={styles.galleryImage}
+      <div className={`
+        ${styles.gallery} 
+        ${section.layout.includes('top') ? styles.galleryTop : ''}
+      `}>
+        {section.gallery.map((img, index) => (
+          <img 
+            key={index}
+            src={img.url} 
+            alt={img.alt || `Imagen ${index + 1}`}
+            className={styles.galleryImage}
                     />
                   ))}
                 </div>

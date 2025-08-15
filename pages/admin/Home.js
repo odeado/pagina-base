@@ -10,9 +10,11 @@ export default function AdminPanel() {
     title: "",
     content: "",
     backgroundColor: "#ffffff",
+    contentBackground: "#ffffff", // color de fondo del contenido
     textColor: "#333333",
     image: "",
-    gallery: []
+    gallery: [],
+    layout: "text-image", // control de disposición
   });
   const [galleryImage, setGalleryImage] = useState("");
   const [sections, setSections] = useState([]);
@@ -271,6 +273,32 @@ const cancelEdit = () => {
 
       <h1 className={styles.adminTitle}>Constructor de Páginas</h1>
 
+{/* Control de disposición */}
+<div className={styles.formGroup}>
+  <label>Disposición de elementos:</label>
+  <select
+    value={section.layout}
+    onChange={(e) => setSection({...section, layout: e.target.value})}
+  >
+    <option value="text-image">Texto - Imagen</option>
+    <option value="image-text">Imagen - Texto</option>
+    <option value="text-only">Solo Texto</option>
+    <option value="image-only">Solo Imagen</option>
+    <option value="gallery-top">Galería arriba</option>
+    <option value="gallery-bottom">Galería abajo</option>
+  </select>
+</div>
+
+{/* Color de fondo del contenido */}
+<div className={styles.formGroup}>
+  <label>Color de fondo del contenido:</label>
+  <input
+    type="color"
+    value={section.contentBackground}
+    onChange={(e) => setSection({...section, contentBackground: e.target.value})}
+  />
+  <span>{section.contentBackground}</span>
+</div>
 
 {/* Sección del Logo */}
 <div className={styles.logoSection}>
