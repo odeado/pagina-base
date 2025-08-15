@@ -152,14 +152,7 @@ useEffect(() => {
 }, []);
 
 
-useEffect(() => {
-  // Solo si realmente necesitas datos en tiempo real
-  const unsubscribe = onSnapshot(collection(db, "tudata"), (snapshot) => {
-    // Actualizar estado con los nuevos datos
-  });
 
-  return () => unsubscribe(); // ¡Importante! Limpia el listener
-}, []);
 
 
 
@@ -517,15 +510,7 @@ const cancelEdit = () => {
         </div>
 
 
-    <div className={styles.colorInput}>
-    <label>Color de fondo del contenido:</label>
-    <input
-      type="color"
-      value={section.contentBackground}
-      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
-    />
-    <span>{section.contentBackground}</span>
-  </div>
+   
 
 
         
@@ -539,6 +524,16 @@ const cancelEdit = () => {
             />
             <span>{section.backgroundColor}</span>
           </div>
+
+           <div className={styles.colorInput}>
+    <label>Color de fondo del contenido:</label>
+    <input
+      type="color"
+      value={section.contentBackground}
+      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
+    />
+    <span>{section.contentBackground}</span>
+  </div>
           
           <div className={styles.colorInput}>
             <label>Color de texto:</label>
