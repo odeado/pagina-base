@@ -373,17 +373,14 @@ const cancelEdit = () => {
         )}
       </div>
 
-      <div className={styles.formGroup}>
+       <div className={styles.colorInput}>
     <label>Color de fondo del contenido:</label>
     <input
       type="color"
-      value={siteSettings.contentBackground}
-      onChange={(e) => setSiteSettings({
-        ...siteSettings,
-        contentBackground: e.target.value
-      })}
+      value={section.contentBackground}
+      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
     />
-    <span>{siteSettings.contentBackground}</span>
+    <span>{section.contentBackground}</span>
   </div>
       
       <button 
@@ -396,15 +393,7 @@ const cancelEdit = () => {
     </div>
 
 
- <div className={styles.colorInput}>
-    <label>Color de fondo del contenido:</label>
-    <input
-      type="color"
-      value={section.contentBackground}
-      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
-    />
-    <span>{section.contentBackground}</span>
-  </div>
+ 
 
 
 
