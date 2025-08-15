@@ -5,27 +5,32 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styles from "../../styles/AdminPanel.module.css";
 
+export const dynamic = 'force-dynamic'; // Desactiva el prerenderizado estático
 export default function AdminPanel() {
-  const [section, setSection] = useState({
+// Estado para siteSettings (logo y título del sitio)
+  const [siteSettings, setSiteSettings] = useState({
     logo: "",
-    siteTitle: "Mi Sitio Web",  // Nuevo: título general del sitio
-    logoLoading: false,
-    settingsId: null,  // Para saber si ya existe configuración
+    siteTitle: "Mi Sitio Web",
+    settingsId: null
+  });
+
+
+    // Estado para las secciones de contenido
+  const [section, setSection] = useState({
     title: "",
     content: "",
     backgroundColor: "#ffffff",
-    contentBackground: "#ffffff", // color de fondo del contenido
+    contentBackground: "#ffffff",
     textColor: "#333333",
     image: "",
     gallery: [],
-    layout: "text-image", // control de disposición
+    layout: "text-image"
   });
+
   const [galleryImage, setGalleryImage] = useState("");
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const [editingId, setEditingId] = useState(null);
-  const [logo, setLogo] = useState("");
   const [logoLoading, setLogoLoading] = useState(false);
 
 
@@ -103,7 +108,7 @@ const saveSiteSettings = async () => {
     return;
   }
 
-  setSiteSettings(prev => ({...prev, logoLoading: true}));
+    setLogoLoading(true);
   
   try {
     const settingsData = {
@@ -126,7 +131,7 @@ const saveSiteSettings = async () => {
     console.error("Error:", error);
     alert("Error al guardar configuración");
   } finally {
-    setSiteSettings(prev => ({...prev, logoLoading: false}));
+    setLogoLoading(false);
   }
 };
 
@@ -150,10 +155,10 @@ const handleLogoChange = (e) => {
     alert("El logo debe ser menor a 500KB");
     return;
   }
-  if (file) {
+    if (file) {
     const reader = new FileReader();
     reader.onloadend = () => {
-      setLogo(reader.result);
+      setSiteSettings({...siteSettings, logo: reader.result});
     };
     reader.readAsDataURL(file);
   }
@@ -346,30 +351,21 @@ const cancelEdit = () => {
         />
       </div>
       
-      <div className={styles.formGroup}>
-        <label>Logo del Sitio:</label>
-        <input
-          type="file"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                setSiteSettings({...siteSettings, logo: reader.result});
-              };
-              reader.readAsDataURL(file);
-            }
-          }}
-          accept="image/*"
-        />
-        {siteSettings.logo && (
-          <div className={styles.imagePreview}>
-            <img src={siteSettings.logo} alt="Logo Preview" />
-            <button 
-              onClick={() => setSiteSettings({...siteSettings, logo: ""})}
-              className={styles.removeButton}
-            >
-              Eliminar logo
+       <div className={styles.formGroup}>
+    <label>Logo del Sitio:</label>
+    <input
+      type="file"
+      onChange={handleLogoChange}
+      accept="image/*"
+    />
+    {siteSettings.logo && (
+      <div className={styles.imagePreview}>
+        <img src={siteSettings.logo} alt="Logo Preview" />
+        <button 
+          onClick={() => setSiteSettings({...siteSettings, logo: ""})}
+          className={styles.removeButton}
+        >
+          Eliminar logo
             </button>
           </div>
         )}
@@ -380,7 +376,7 @@ const cancelEdit = () => {
         disabled={!siteSettings.logo || siteSettings.logoLoading}
         className={styles.saveButton}
       >
-        {siteSettings.logoLoading ? "Guardando..." : "Guardar Configuración"}
+        {logoLoading ? "Guardando..." : "Guardar Configuración"}
       </button>
     </div>
 
