@@ -32,6 +32,8 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [logoLoading, setLogoLoading] = useState(false);
+  const router = useRouter();
+ 
 
 
 
@@ -164,29 +166,7 @@ const handleLogoChange = (e) => {
   }
 };
 
-// Función para guardar el logo
-const saveLogo = async () => {
-  if (!logo) {
-    alert("Debes seleccionar un logo primero");
-    return;
-  }
-  
-  setLogoLoading(true);
-  try {
-    // Guardamos el logo en una colección especial
-    await addDoc(collection(db, "siteSettings"), {
-      type: "logo",
-      image: logo,
-      createdAt: new Date()
-    });
-    alert("Logo guardado correctamente");
-  } catch (error) {
-    console.error("Error:", error);
-    alert("Error al guardar el logo");
-  } finally {
-    setLogoLoading(false);
-  }
-};
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -373,7 +353,7 @@ const cancelEdit = () => {
       
       <button 
         onClick={saveSiteSettings}
-        disabled={!siteSettings.logo || siteSettings.logoLoading}
+        disabled={!siteSettings.logo || logoLoading}
         className={styles.saveButton}
       >
         {logoLoading ? "Guardando..." : "Guardar Configuración"}
@@ -434,30 +414,7 @@ const cancelEdit = () => {
   <span>{section.contentBackground}</span>
 </div>
 
-{/* Sección del Logo */}
-<div className={styles.logoSection}>
-  <h2>Logo del Sitio</h2>
-  <div className={styles.formGroup}>
-    <label>Subir Logo:</label>
-    <input
-      type="file"
-      onChange={handleLogoChange}
-      accept="image/*"
-    />
-    {logo && (
-      <div className={styles.imagePreview}>
-        <img src={logo} alt="Logo Preview" />
-      </div>
-    )}
-    <button 
-      onClick={saveLogo}
-      disabled={!logo || logoLoading}
-      className={styles.saveButton}
-    >
-      {logoLoading ? "Guardando..." : "Guardar Logo"}
-    </button>
-  </div>
-</div>
+
 
 {/* Sección del Menú */}
 <div className={styles.menuSection}>
