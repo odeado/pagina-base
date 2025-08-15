@@ -69,7 +69,9 @@ export default function BuiltPage() {
  if (loading) return <div className={styles.loading}>Cargando página...</div>;
 
   return (
-    <div className={styles.pageContainer}>
+    <div className={styles.pageContainer}
+    style={{ backgroundColor: siteSettings.contentBackground || '#ffffff' }}
+    >
        <Head>
         <title>{siteSettings.siteTitle}</title>
         <meta name="description" content="Página construida dinámicamente" />

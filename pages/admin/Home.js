@@ -227,13 +227,18 @@ const handleLogoChange = (e) => {
       title: section.title,
       content: section.content,
       backgroundColor: section.backgroundColor,
+      contentBackground: section.contentBackground,
       textColor: section.textColor,
       image: section.image,
       gallery: section.gallery,
       layout: section.layout, // Asegúrate de guardar el layout
-      createdAt: editingId ? undefined : new Date(),
       updatedAt: new Date()
     };
+
+    // Solo agregar createdAt si es una nueva sección
+    if (!editingId) {
+      sectionData.createdAt = new Date();
+    }
 
     if (editingId) {
       await updateDoc(doc(db, "pageSections", editingId), sectionData);
@@ -246,10 +251,13 @@ const handleLogoChange = (e) => {
         title: "",
         content: "",
         backgroundColor: "#ffffff",
+        contentBackground: "#f0f0f0",
         textColor: "#333333",
         image: "",
-        gallery: []
+        gallery: [],
+        layout: "text-image"
       });
+      setEditingId(null);
       fetchSections();
     } catch (error) {
       console.error("Error:", error);
@@ -266,6 +274,7 @@ const handleLogoChange = (e) => {
       title: sectionToEdit.title,
       content: sectionToEdit.content,
       backgroundColor: sectionToEdit.backgroundColor || "#ffffff",
+      contentBackground: sectionToEdit.contentBackground || "#f0f0f0",
       textColor: sectionToEdit.textColor || "#333333",
       image: sectionToEdit.image || "",
       gallery: sectionToEdit.gallery || [],
