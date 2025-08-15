@@ -152,7 +152,14 @@ useEffect(() => {
 }, []);
 
 
+useEffect(() => {
+  // Solo si realmente necesitas datos en tiempo real
+  const unsubscribe = onSnapshot(collection(db, "tudata"), (snapshot) => {
+    // Actualizar estado con los nuevos datos
+  });
 
+  return () => unsubscribe(); // ¡Importante! Limpia el listener
+}, []);
 
 
 
