@@ -268,7 +268,8 @@ const handleLogoChange = (e) => {
       backgroundColor: sectionToEdit.backgroundColor || "#ffffff",
       textColor: sectionToEdit.textColor || "#333333",
       image: sectionToEdit.image || "",
-      gallery: sectionToEdit.gallery || []
+      gallery: sectionToEdit.gallery || [],
+      layout: sectionToEdit.layout || "text-image"
     });
     setEditingId(id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
