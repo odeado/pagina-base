@@ -113,7 +113,7 @@ const saveSiteSettings = async () => {
     alert("Debes seleccionar un logo");
     return;
   }
-console.log("Guardando configuración:", settingsData);
+
     setLogoLoading(true);
   
   try {
@@ -123,6 +123,8 @@ console.log("Guardando configuración:", settingsData);
       contentBackground: siteSettings.contentBackground,
       updatedAt: new Date()
     };
+
+    console.log("Guardando configuración:", settingsData);
 
     if (siteSettings.settingsId) {
       // Actualizar si ya existe
