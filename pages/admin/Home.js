@@ -373,15 +373,7 @@ const cancelEdit = () => {
         )}
       </div>
 
-       <div className={styles.colorInput}>
-    <label>Color de fondo del contenido:</label>
-    <input
-      type="color"
-      value={section.contentBackground}
-      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
-    />
-    <span>{section.contentBackground}</span>
-  </div>
+   
       
       <button 
         onClick={saveSiteSettings}
@@ -516,6 +508,19 @@ const cancelEdit = () => {
             rows={5}
           />
         </div>
+
+
+    <div className={styles.colorInput}>
+    <label>Color de fondo del contenido:</label>
+    <input
+      type="color"
+      value={section.contentBackground}
+      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
+    />
+    <span>{section.contentBackground}</span>
+  </div>
+
+
         
         <div className={styles.colorGroup}>
           <div className={styles.colorInput}>
