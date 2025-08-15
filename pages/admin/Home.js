@@ -11,6 +11,7 @@ export default function AdminPanel() {
   const [siteSettings, setSiteSettings] = useState({
     logo: "",
     siteTitle: "Mi Sitio Web",
+    contentBackground: "#ffffff",
     settingsId: null
   });
 
@@ -93,13 +94,16 @@ const fetchSiteSettings = async () => {
     if (!querySnapshot.empty) {
       const docData = querySnapshot.docs[0].data();
       setSiteSettings({
-        ...docData,
+        logo: docData.logo || "",
+        siteTitle: docData.siteTitle || "Mi Sitio Web",
+        contentBackground: docData.contentBackground || "#ffffff",
         settingsId: querySnapshot.docs[0].id,
         logoLoading: false
       });
     }
   } catch (error) {
     console.error("Error cargando configuración:", error);
+    console.log("Configuración cargada:", docData);
   }
 };
 
@@ -109,13 +113,14 @@ const saveSiteSettings = async () => {
     alert("Debes seleccionar un logo");
     return;
   }
-
+console.log("Guardando configuración:", settingsData);
     setLogoLoading(true);
   
   try {
     const settingsData = {
       logo: siteSettings.logo,
       siteTitle: siteSettings.siteTitle,
+      contentBackground: siteSettings.contentBackground,
       updatedAt: new Date()
     };
 
@@ -214,22 +219,25 @@ const handleLogoChange = (e) => {
       return;
     }
     
-    setLoading(true);
-    try {
-      if (editingId) {
-        // Modo edición - actualizar documento existente
-        await updateDoc(doc(db, "pageSections", editingId), {
-          ...section,
-          updatedAt: new Date()
-        });
-        setEditingId(null); // Salir del modo edición
-      } else {
-        // Modo creación - agregar nuevo documento
-        await addDoc(collection(db, "pageSections"), {
-          ...section,
-          createdAt: new Date()
-        });
-      }
+  setLoading(true);
+  try {
+    const sectionData = {
+      title: section.title,
+      content: section.content,
+      backgroundColor: section.backgroundColor,
+      textColor: section.textColor,
+      image: section.image,
+      gallery: section.gallery,
+      layout: section.layout, // Asegúrate de guardar el layout
+      createdAt: editingId ? undefined : new Date(),
+      updatedAt: new Date()
+    };
+
+    if (editingId) {
+      await updateDoc(doc(db, "pageSections", editingId), sectionData);
+    } else {
+      await addDoc(collection(db, "pageSections"), sectionData);
+    }
 
       // Reset form
       setSection({
@@ -350,6 +358,19 @@ const cancelEdit = () => {
           </div>
         )}
       </div>
+
+      <div className={styles.formGroup}>
+    <label>Color de fondo del contenido:</label>
+    <input
+      type="color"
+      value={siteSettings.contentBackground}
+      onChange={(e) => setSiteSettings({
+        ...siteSettings,
+        contentBackground: e.target.value
+      })}
+    />
+    <span>{siteSettings.contentBackground}</span>
+  </div>
       
       <button 
         onClick={saveSiteSettings}
@@ -403,16 +424,7 @@ const cancelEdit = () => {
       </div>
     </div>
 
-{/* Color de fondo del contenido */}
-<div className={styles.formGroup}>
-  <label>Color de fondo del contenido:</label>
-  <input
-    type="color"
-    value={section.contentBackground}
-    onChange={(e) => setSection({...section, contentBackground: e.target.value})}
-  />
-  <span>{section.contentBackground}</span>
-</div>
+
 
 
 
