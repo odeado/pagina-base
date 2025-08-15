@@ -65,7 +65,12 @@
 }
 
 .colorInput {
-  flex: 1;
+  margin: 10px 0;
+}
+
+.colorInput label {
+  display: block;
+  margin-bottom: 5px;
 }
 
 .colorInput input[type="color"] {

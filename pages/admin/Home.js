@@ -291,9 +291,11 @@ const cancelEdit = () => {
     title: "",
     content: "",
     backgroundColor: "#ffffff",
+    contentBackground: "#f0f0f0",
     textColor: "#333333",
     image: "",
-    gallery: []
+    gallery: [],
+    layout: "text-image"
   });
 };
 
@@ -394,7 +396,15 @@ const cancelEdit = () => {
     </div>
 
 
-
+ <div className={styles.colorInput}>
+    <label>Color de fondo del contenido:</label>
+    <input
+      type="color"
+      value={section.contentBackground}
+      onChange={(e) => setSection({...section, contentBackground: e.target.value})}
+    />
+    <span>{section.contentBackground}</span>
+  </div>
 
 
 
