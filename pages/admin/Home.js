@@ -11,7 +11,10 @@ export default function AdminPanel() {
   const [siteSettings, setSiteSettings] = useState({
     logo: "",
     siteTitle: "Mi Sitio Web",
-    contentBackground: "#ffffff",
+    backgroundType: "solid",
+    backgroundColor: "#ffffff",
+    gradientColors: ["#ffffff", "#f0f0f0"],
+    gradientDirection: "to right",
     settingsId: null
   });
 
@@ -20,12 +23,22 @@ export default function AdminPanel() {
   const [section, setSection] = useState({
     title: "",
     content: "",
+    backgroundType: "solid",
     backgroundColor: "#ffffff",
+    gradientColors: ["#ffffff", "#f0f0f0"],
+    gradientDirection: "to right",
     contentBackground: "#ffffff",
     textColor: "#333333",
     image: "",
     gallery: [],
-    layout: "text-image"
+    layout: "text-image",
+    border: {
+    top: false,
+    bottom: false,
+    color: "#dddddd",
+    width: "1px",
+    style: "solid"
+  }
   });
 
   const [galleryImage, setGalleryImage] = useState("");
@@ -153,9 +166,118 @@ useEffect(() => {
 
 
 
+const GradientControls = ({ settings, onChange }) => {
+  return (
+    <div className={styles.gradientControls}>
+      <div className={styles.formGroup}>
+        <label>Dirección del degradado:</label>
+        <select
+          value={settings.gradientDirection}
+          onChange={(e) => onChange({...settings, gradientDirection: e.target.value})}
+        >
+          <option value="to right">Horizontal (→)</option>
+          <option value="to left">Horizontal (←)</option>
+          <option value="to bottom">Vertical (↓)</option>
+          <option value="to top">Vertical (↑)</option>
+          <option value="to bottom right">Diagonal (↘)</option>
+          <option value="to top left">Diagonal (↖)</option>
+        </select>
+      </div>
+      
+      <div className={styles.colorInputs}>
+        <div>
+          <label>Color 1:</label>
+          <input
+            type="color"
+            value={settings.gradientColors[0]}
+            onChange={(e) => onChange({
+              ...settings, 
+              gradientColors: [e.target.value, settings.gradientColors[1]]
+            })}
+          />
+        </div>
+        <div>
+          <label>Color 2:</label>
+          <input
+            type="color"
+            value={settings.gradientColors[1]}
+            onChange={(e) => onChange({
+              ...settings, 
+              gradientColors: [settings.gradientColors[0], e.target.value]
+            })}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
-
-
+const BorderControls = ({ border, onChange }) => {
+  return (
+    <div className={styles.borderControls}>
+      <h4>Configuración de bordes</h4>
+      
+      <div className={styles.checkboxGroup}>
+        <label>
+          <input
+            type="checkbox"
+            checked={border.top}
+            onChange={(e) => onChange({...border, top: e.target.checked})}
+          />
+          Borde superior
+        </label>
+        
+        <label>
+          <input
+            type="checkbox"
+            checked={border.bottom}
+            onChange={(e) => onChange({...border, bottom: e.target.checked})}
+          />
+          Borde inferior
+        </label>
+      </div>
+      
+      { (border.top || border.bottom) && (
+        <div className={styles.borderStyle}>
+          <div className={styles.formGroup}>
+            <label>Color del borde:</label>
+            <input
+              type="color"
+              value={border.color}
+              onChange={(e) => onChange({...border, color: e.target.value})}
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label>Grosor:</label>
+            <select
+              value={border.width}
+              onChange={(e) => onChange({...border, width: e.target.value})}
+            >
+              <option value="1px">Fino (1px)</option>
+              <option value="2px">Mediano (2px)</option>
+              <option value="3px">Grueso (3px)</option>
+              <option value="4px">Muy grueso (4px)</option>
+            </select>
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label>Estilo:</label>
+            <select
+              value={border.style}
+              onChange={(e) => onChange({...border, style: e.target.value})}
+            >
+              <option value="solid">Sólido</option>
+              <option value="dashed">Segmentado</option>
+              <option value="dotted">Punteado</option>
+              <option value="double">Doble</option>
+            </select>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
   // Función para manejar el cambio de logo
 const handleLogoChange = (e) => {
