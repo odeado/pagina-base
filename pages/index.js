@@ -193,7 +193,21 @@ const closeImageModal = () => {
               }}
             >
               {section.title && (
-                <h2 className={styles.sectionTitle}>{section.title}</h2>
+                <h2 
+    className={styles.sectionTitle}
+    style={{
+      fontSize: section.titleStyle?.size === 'h1' ? '2rem' : 
+               section.titleStyle?.size === 'h2' ? '1.5rem' :
+               section.titleStyle?.size === 'h3' ? '1.2rem' : '1rem',
+      textAlign: section.titleStyle?.alignment || 'left',
+      color: section.titleStyle?.color || '#333333',
+      textDecoration: section.titleStyle?.underline ? 'underline' : 'none',
+      fontFamily: section.titleStyle?.fontFamily || 'inherit',
+      margin: '0 0 1rem 0'
+    }}
+  >
+    {section.title}
+  </h2>
               )}
 
               {renderSectionContent(section)}
@@ -260,10 +274,32 @@ const closeImageModal = () => {
 
 // Función auxiliar para renderizar el contenido según el layout
 function renderSectionContent(section) {
+  // Función para renderizar el título con estilos
+  const renderTitle = () => (
+    section.title && (
+      <h2 
+        className={styles.sectionTitle}
+        style={{
+          fontSize: section.titleStyle?.size === 'h1' ? '2rem' : 
+                   section.titleStyle?.size === 'h2' ? '1.5rem' :
+                   section.titleStyle?.size === 'h3' ? '1.2rem' : '1rem',
+          textAlign: section.titleStyle?.alignment || 'left',
+          color: section.titleStyle?.color || '#333333',
+          textDecoration: section.titleStyle?.underline ? 'underline' : 'none',
+          fontFamily: section.titleStyle?.fontFamily || 'inherit',
+          margin: '0 0 1rem 0'
+        }}
+      >
+        {section.title}
+      </h2>
+    )
+  );
+
   switch(section.layout) {
     case 'image-text':
       return (
         <div className={styles.flexContainer}>
+          {renderTitle()}
           {section.image && (
             <img 
               src={section.image} 
@@ -284,6 +320,7 @@ function renderSectionContent(section) {
     case 'text-image':
       return (
         <div className={styles.flexContainer}>
+          {renderTitle()}
           {section.content && (
             <div className={styles.sectionText}>
               {section.content.split('\n').map((paragraph, i) => (
@@ -302,26 +339,37 @@ function renderSectionContent(section) {
       );
     
     case 'image-only':
-      return section.image && (
-        <img 
-          src={section.image} 
-          alt={section.imageAlt || ''}
-          className={styles.sectionImage}
-        />
+      return (
+        <>
+          {renderTitle()}
+          {section.image && (
+            <img 
+              src={section.image} 
+              alt={section.imageAlt || ''}
+              className={styles.sectionImage}
+            />
+          )}
+        </>
       );
     
     case 'text-only':
-      return section.content && (
-        <div className={styles.sectionText}>
-          {section.content.split('\n').map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
-        </div>
+      return (
+        <>
+          {renderTitle()}
+          {section.content && (
+            <div className={styles.sectionText}>
+              {section.content.split('\n').map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+            </div>
+          )}
+        </>
       );
     
     default:
       return (
         <>
+          {renderTitle()}
           {section.image && (
             <img 
               src={section.image} 
