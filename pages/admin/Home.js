@@ -1,4 +1,4 @@
-import dynamic from 'next/dynamic';
+
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
@@ -95,6 +95,7 @@ export default function AdminPanel() {
   useEffect(() => { 
     fetchSections();
     fetchPages();
+    fetchSiteSettings();
   }, []);
 
   // Cargar configuración existente
@@ -525,7 +526,8 @@ export default function AdminPanel() {
       const querySnapshot = await getDocs(collection(db, "pageSections"));
       const data = querySnapshot.docs.map(doc => ({ 
         id: doc.id, 
-        ...doc.data() 
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate()
       }));
       setSections(data.sort((a, b) => 
         a.createdAt?.toDate() - b.createdAt?.toDate()
@@ -632,7 +634,7 @@ export default function AdminPanel() {
           className={styles.previewSection}
           style={{
             color: section.textColor,
-            backgroundColor: section.backgroundType === 'solid' 
+            background: section.backgroundType === 'solid' 
               ? section.backgroundColor 
               : `linear-gradient(${section.gradientDirection}, ${section.gradientColors.join(', ')})`,
             borderTop: section.border.top 
