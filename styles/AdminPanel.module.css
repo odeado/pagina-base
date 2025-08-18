@@ -64,8 +64,44 @@
   margin-bottom: 20px;
 }
 
-.colorInput {
-  margin: 10px 0;
+/* Estilos para los nuevos controles */
+.gradientControls {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.colorInputs {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.borderControls {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.borderStyle {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.checkboxGroup {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.titleStyleControls {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f8f8;
+  border-radius: 8px;
 }
 
 .colorInput label {
@@ -190,10 +226,17 @@
   margin-top: 20px;
 }
 
+/* Mejoras visuales para las tarjetas de sección */
 .sectionCard {
   border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sectionCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .sectionCard h3 {
@@ -294,29 +337,26 @@
   align-items: center;
 }
 
+/* Estilos para la vista previa de disposición */
 .layoutPreview {
   margin: 1rem 0;
   padding: 1rem;
-  background: #f5f5f5;
-  border-radius: 4px;
+  background: #f8f8f8;
+  border-radius: 8px;
 }
 
 .previewContainer {
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
-  padding: 1rem;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
 }
 
 .previewText, .previewImage {
-  padding: 1.5rem;
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+  background: #e0e0e0;
   border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .previewText {
