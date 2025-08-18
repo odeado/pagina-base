@@ -273,6 +273,50 @@ const GradientControls = ({ settings, onChange }) => {
   );
 };
 
+
+// Función para comprimir imágenes
+const compressImage = async (file, maxWidth = 800, quality = 0.7) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Calcular nuevo tamaño manteniendo aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dibujar imagen comprimida
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir a base64 con calidad reducida
+        canvas.toBlob(
+          (blob) => {
+            const newReader = new FileReader();
+            newReader.onloadend = () => resolve(newReader.result);
+            newReader.readAsDataURL(blob);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+
 const BorderControls = ({ border, onChange }) => {
   return (
     <div className={styles.borderControls}>
@@ -359,52 +403,55 @@ const sectionStyle = {
 };
 
   // Función para manejar el cambio de logo
-const handleLogoChange = (e) => {
+const handleLogoChange = async (e) => {
   const file = e.target.files[0];
-  if (file && file.size > 500000) {
-    alert("El logo debe ser menor a 500KB");
-    return;
-  }
-    if (file) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setSiteSettings({...siteSettings, logo: reader.result});
-    };
-    reader.readAsDataURL(file);
+  if (!file) return;
+  
+  setLogoLoading(true);
+  try {
+    const compressedImage = await compressImage(file);
+    setSiteSettings({...siteSettings, logo: compressedImage});
+  } catch (error) {
+    console.error("Error comprimiendo imagen:", error);
+    alert("Error al procesar la imagen");
+  } finally {
+    setLogoLoading(false);
   }
 };
 
 
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size > 500000) {
-      alert("La imagen debe ser menor a 500KB");
-      return;
-    }
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSection({...section, image: reader.result});
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+const handleImageChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  setLoading(true);
+  try {
+    const compressedImage = await compressImage(file);
+    setSection({...section, image: compressedImage});
+  } catch (error) {
+    console.error("Error comprimiendo imagen:", error);
+    alert("Error al procesar la imagen");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const handleGalleryImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size > 500000) {
-      alert("La imagen debe ser menor a 500KB");
-      return;
-    }
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setGalleryImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleGalleryImageChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  setLoading(true);
+  try {
+    const compressedImage = await compressImage(file);
+    setGalleryImage(compressedImage);
+  } catch (error) {
+    console.error("Error comprimiendo imagen:", error);
+    alert("Error al procesar la imagen");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const addGalleryImage = () => {
     if (galleryImage) {
