@@ -469,7 +469,10 @@ export default function AdminPanel() {
       setSection({
         title: sectionToEdit.title,
         content: sectionToEdit.content,
+        backgroundType: sectionToEdit.backgroundType || "solid",
         backgroundColor: sectionToEdit.backgroundColor || "#ffffff",
+        gradientColors: sectionToEdit.gradientColors || ["#ffffff", "#f0f0f0"],
+        gradientDirection: sectionToEdit.gradientDirection || "to right",
         contentBackground: sectionToEdit.contentBackground || "#f0f0f0",
         textColor: sectionToEdit.textColor || "#333333",
         image: sectionToEdit.image || "",
