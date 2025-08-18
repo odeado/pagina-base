@@ -486,6 +486,7 @@ const TitleStyleControls = ({ style, onChange }) => {
       gallery: section.gallery,
       layout: section.layout,
       border: section.border,
+      titleStyle: section.titleStyle,
       updatedAt: serverTimestamp(),
     };
 
@@ -518,7 +519,14 @@ const TitleStyleControls = ({ style, onChange }) => {
           color: "#dddddd",
           width: "1px",
           style: "solid"
-        }
+        },
+        titleStyle: {
+          size: "h2", // h1, h2, h3, h4
+          alignment: "left", // left, center, right
+          color: "#333333",
+          fontFamily: "Arial, sans-serif",
+    underline: false
+  }
       });
       setEditingId(null);
       fetchSections();
@@ -551,7 +559,14 @@ const TitleStyleControls = ({ style, onChange }) => {
           color: "#dddddd",
           width: "1px",
           style: "solid"
-        }
+        },
+        titleStyle: {
+          size: "h2", // h1, h2, h3, h4
+          alignment: "left", // left, center, right
+          color: "#333333",
+          fontFamily: "Arial, sans-serif",
+    underline: false
+  }
       });
       setEditingId(id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -575,7 +590,14 @@ const TitleStyleControls = ({ style, onChange }) => {
         color: "#dddddd",
         width: "1px",
         style: "solid"
-      }
+      },
+         titleStyle: {
+    size: "h2", // h1, h2, h3, h4
+    alignment: "left", // left, center, right
+    color: "#333333",
+    fontFamily: "Arial, sans-serif",
+    underline: false
+  }
     });
   };
 
