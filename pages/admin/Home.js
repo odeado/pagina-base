@@ -39,7 +39,14 @@ export default function AdminPanel() {
       color: "#dddddd",
       width: "1px",
       style: "solid",
-    }
+    },
+    titleStyle: {
+    size: "h2", // h1, h2, h3, h4
+    alignment: "left", // left, center, right
+    color: "#333333",
+    fontFamily: "Arial, sans-serif",
+    underline: false
+  }
   });
 
   const [galleryImage, setGalleryImage] = useState("");
@@ -159,6 +166,61 @@ export default function AdminPanel() {
     fetchPages();
     fetchSiteSettings();
   }, []);
+
+
+  // Componente para estilos de título
+const TitleStyleControls = ({ style, onChange }) => {
+  return (
+    <div className={styles.titleStyleControls}>
+      <h4>Estilo del título</h4>
+      
+      <div className={styles.formGroup}>
+        <label>Tamaño:</label>
+        <select
+          value={style.size}
+          onChange={(e) => onChange({...style, size: e.target.value})}
+        >
+          <option value="h1">Título 1 (Grande)</option>
+          <option value="h2">Título 2 (Mediano)</option>
+          <option value="h3">Título 3 (Pequeño)</option>
+          <option value="h4">Título 4 (Muy pequeño)</option>
+        </select>
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>Alineación:</label>
+        <select
+          value={style.alignment}
+          onChange={(e) => onChange({...style, alignment: e.target.value})}
+        >
+          <option value="left">Izquierda</option>
+          <option value="center">Centro</option>
+          <option value="right">Derecha</option>
+        </select>
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>Color:</label>
+        <input
+          type="color"
+          value={style.color}
+          onChange={(e) => onChange({...style, color: e.target.value})}
+        />
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>
+          <input
+            type="checkbox"
+            checked={style.underline}
+            onChange={(e) => onChange({...style, underline: e.target.checked})}
+          />
+          Subrayado
+        </label>
+      </div>
+    </div>
+  );
+};
 
   // Componente para gradientes
   const GradientControls = ({ settings, onChange }) => {
@@ -670,7 +732,19 @@ export default function AdminPanel() {
             padding: '1rem'
           }}
         >
-          <h4>{section.title || 'Título de ejemplo'}</h4>
+            <h4 
+      style={{
+        fontSize: section.titleStyle.size === 'h1' ? '2rem' : 
+                 section.titleStyle.size === 'h2' ? '1.5rem' :
+                 section.titleStyle.size === 'h3' ? '1.2rem' : '1rem',
+        textAlign: section.titleStyle.alignment,
+        color: section.titleStyle.color,
+        textDecoration: section.titleStyle.underline ? 'underline' : 'none',
+        fontFamily: section.titleStyle.fontFamily
+      }}
+    >
+      {section.title || 'Título de ejemplo'}
+    </h4>
           <p>{section.content || 'Este es un texto de ejemplo para la vista previa...'}</p>
           {section.image && (
             <img 
@@ -788,6 +862,11 @@ export default function AdminPanel() {
           border={section.border}
           onChange={(newBorder) => setSection({...section, border: newBorder})}
         />
+
+        <TitleStyleControls 
+    style={section.titleStyle}
+    onChange={(newStyle) => setSection({...section, titleStyle: newStyle})}
+  />
         
         <div className={styles.colorInput}>
           <label>Color de fondo del contenido:</label>
