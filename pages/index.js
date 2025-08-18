@@ -12,11 +12,12 @@ export default function BuiltPage() {
   logo: "",
   siteTitle: "Mi Sitio Web"
 });
+const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
 
  // Función para cargar las secciones
   const fetchSections = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "pageSections")); // Cambiado a pageSections
+      const querySnapshot = await getDocs(collection(db, "pageSections")); 
       const data = querySnapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data() 
@@ -65,6 +66,22 @@ export default function BuiltPage() {
     
     loadData();
   }, []);
+
+
+// Función para abrir imagen en grande
+  const openImageModal = (img) => {
+    setSelectedImage(img);
+  };
+
+  // Función para cerrar el modal
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
+
+
+
+
 
  if (loading) return <div className={styles.loading}>Cargando página...</div>;
 
@@ -132,6 +149,8 @@ export default function BuiltPage() {
                       src={img.url} 
                       alt={img.alt || `Imagen ${index + 1}`}
                       className={styles.galleryImage}
+                      onClick={() => openImageModal(img)}
+                      style={{ cursor: 'pointer' }}
                     />
                   ))}
                 </div>
@@ -140,6 +159,21 @@ export default function BuiltPage() {
           </section>
         ))}
       </main>
+
+
+ {/* Modal para imagen en grande */}
+      {selectedImage && (
+        <div className={styles.imageModal} onClick={closeImageModal}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <span className={styles.closeButton} onClick={closeImageModal}>&times;</span>
+            <img 
+              src={selectedImage.url} 
+              alt={selectedImage.alt || "Imagen en grande"} 
+              className={styles.modalImage}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
