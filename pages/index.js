@@ -170,11 +170,22 @@ const closeImageModal = () => {
           <section 
             key={section.id} 
             className={styles.pageSection}
-            style={{ 
-              backgroundColor: section.backgroundColor || '#ffffff',
-              color: section.textColor || '#333333'
-            }}
-          >
+          style={{ 
+    ...(section.backgroundType === 'solid'
+      ? { backgroundColor: section.backgroundColor || '#ffffff' }
+      : { 
+          background: `linear-gradient(${section.gradientDirection || 'to right'}, ${(section.gradientColors || ['#ffffff', '#f0f0f0']).join(', ')})`
+        }
+    ),
+    color: section.textColor || '#333333',
+    ...(section.border?.top && {
+      borderTop: `${section.border.width || '1px'} ${section.border.style || 'solid'} ${section.border.color || '#dddddd'}`
+    }),
+    ...(section.border?.bottom && {
+      borderBottom: `${section.border.width || '1px'} ${section.border.style || 'solid'} ${section.border.color || '#dddddd'}`
+    })
+  }}
+>
             <div 
               className={styles.sectionContent}
               style={{
