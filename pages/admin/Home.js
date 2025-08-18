@@ -419,12 +419,10 @@ export default function AdminPanel() {
         image: section.image,
         gallery: section.gallery,
         layout: section.layout,
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        ...(editingId ? {} : { createdAt: new Date() })
       };
 
-      if (!editingId) {
-        sectionData.createdAt = new Date();
-      }
 
       if (editingId) {
         await updateDoc(doc(db, "pageSections", editingId), sectionData);
@@ -521,23 +519,43 @@ export default function AdminPanel() {
   };
 
   const fetchSections = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, "pageSections"));
-      const data = querySnapshot.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate()
-      }));
-      setSections(data.sort((a, b) => 
-        a.createdAt?.toDate() - b.createdAt?.toDate()
-      ));
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const querySnapshot = await getDocs(collection(db, "pageSections"));
+    const data = querySnapshot.docs.map(doc => {
+      const docData = doc.data();
+      let createdAt = new Date(0); // Fecha por defecto (epoch)
+      
+      if (docData.createdAt) {
+        // Si es un Timestamp de Firebase
+        if (typeof docData.createdAt.toDate === 'function') {
+          createdAt = docData.createdAt.toDate();
+        } 
+        // Si ya es un objeto Date
+        else if (docData.createdAt instanceof Date) {
+          createdAt = docData.createdAt;
+        }
+        // Si es un string de fecha ISO
+        else if (typeof docData.createdAt === 'string') {
+          createdAt = new Date(docData.createdAt);
+        }
+      }
+      
+      return {
+        id: doc.id,
+        ...docData,
+        createdAt
+      };
+    });
+    
+    // Ordenar por fecha (de más nuevo a más viejo)
+    setSections(data.sort((a, b) => b.createdAt - a.createdAt));
+  } catch (error) {
+    console.error("Error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => { 
     fetchSections(); 
