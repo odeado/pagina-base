@@ -1,4 +1,4 @@
-
+import { serverTimestamp } from 'firebase/firestore';
 import { useState, useEffect } from "react";
 import { db } from "../../firebase";
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
@@ -410,6 +410,8 @@ export default function AdminPanel() {
     
     setLoading(true);
     try {
+      const { serverTimestamp } = require("firebase/firestore");
+
       const sectionData = {
         title: section.title,
         content: section.content,
@@ -419,8 +421,8 @@ export default function AdminPanel() {
         image: section.image,
         gallery: section.gallery,
         layout: section.layout,
-        updatedAt: new Date(),
-        ...(editingId ? {} : { createdAt: new Date() })
+        updatedAt: serverTimestamp(),
+        ...(editingId ? {} : { createdAt: serverTimestamp() })
       };
 
 
@@ -524,34 +526,30 @@ export default function AdminPanel() {
     const querySnapshot = await getDocs(collection(db, "pageSections"));
     const data = querySnapshot.docs.map(doc => {
       const docData = doc.data();
-      let createdAt = new Date(0); // Fecha por defecto (epoch)
       
-      if (docData.createdAt) {
-        // Si es un Timestamp de Firebase
-        if (typeof docData.createdAt.toDate === 'function') {
-          createdAt = docData.createdAt.toDate();
-        } 
-        // Si ya es un objeto Date
-        else if (docData.createdAt instanceof Date) {
-          createdAt = docData.createdAt;
-        }
-        // Si es un string de fecha ISO
-        else if (typeof docData.createdAt === 'string') {
-          createdAt = new Date(docData.createdAt);
-        }
-      }
+      // Manejo robusto de fechas
+      const parseDate = (date) => {
+        if (!date) return new Date(0); // Fecha por defecto si no existe
+        if (typeof date.toDate === 'function') return date.toDate(); // Si es Timestamp
+        if (date instanceof Date) return date; // Si ya es Date
+        if (typeof date === 'string') return new Date(date); // Si es string ISO
+        if (typeof date === 'number') return new Date(date); // Si es timestamp numérico
+        return new Date(0); // Fallback
+      };
+
       
-      return {
+   return {
         id: doc.id,
         ...docData,
-        createdAt
+        createdAt: parseDate(docData.createdAt),
+        updatedAt: parseDate(docData.updatedAt)
       };
     });
     
-    // Ordenar por fecha (de más nuevo a más viejo)
+    // Ordenar por fecha (nuevas primero)
     setSections(data.sort((a, b) => b.createdAt - a.createdAt));
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error cargando secciones:", error);
   } finally {
     setLoading(false);
   }
@@ -908,7 +906,7 @@ export default function AdminPanel() {
                 <p>{sec.content?.split('\n')[0]}...</p>
                 <div className={styles.sectionActions}>
                   <small>
-                    {sec.createdAt?.toDate()?.toLocaleString()}
+                    {sec.createdAt?.toLocaleString?.() || "Fecha desconocida"}
                   </small>
                   <div>
                     <button 
