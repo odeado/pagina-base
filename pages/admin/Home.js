@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import styles from "../../styles/AdminPanel.module.css";
 
-export const dynamic = 'force-dynamic';
+
 export default function AdminPanel() {
   
   // Estado para siteSettings (logo y título del sitio)
