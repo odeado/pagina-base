@@ -270,7 +270,8 @@ function renderSectionContent(section) {
           color: section.titleStyle?.color || '#333333',
           textDecoration: section.titleStyle?.underline ? 'underline' : 'none',
           fontFamily: section.titleStyle?.fontFamily || 'inherit',
-          margin: '0 0 1rem 0'
+          margin: '0 0 1rem 0',
+          width: '100%'
         }}
       >
         {section.title}
@@ -281,29 +282,32 @@ function renderSectionContent(section) {
   switch(section.layout) {
     case 'image-text':
       return (
-        <div className={styles.flexContainer}>
-          {renderTitle()}
-          {section.image && (
-            <img 
-              src={section.image} 
-              alt={section.imageAlt || ''}
+        <div className={styles.flexContainer} style={{ flexDirection: 'row' }}>
+          <div style={{ width: '100%' }}> {/* Contenedor para título y contenido */}
+            {renderTitle()}
+            {section.content && (
+              <div className={styles.sectionText}>
+                {section.content.split('\n').map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+            )}
+          </div>
+            {section.image && (
+              <img
+                src={section.image}
+                alt={section.imageAlt || ''}
               className={styles.sectionImage}
             />
           )}
-          {section.content && (
-            <div className={styles.sectionText}>
-              {section.content.split('\n').map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
-            </div>
-          )}
-        </div>
+               </div>
       );
     
     case 'text-image':
       return (
-        <div className={styles.flexContainer}>
-          {renderTitle()}
+        <div className={styles.flexContainer} style={{ flexDirection: 'row-reverse' }}>
+          <div style={{ width: '100%' }}> {/* Contenedor para título y contenido */}
+            {renderTitle()}
           {section.content && (
             <div className={styles.sectionText}>
               {section.content.split('\n').map((paragraph, i) => (
@@ -311,7 +315,8 @@ function renderSectionContent(section) {
               ))}
             </div>
           )}
-          {section.image && (
+        </div>
+        {section.image && (
             <img 
               src={section.image} 
               alt={section.imageAlt || ''}
@@ -320,6 +325,8 @@ function renderSectionContent(section) {
           )}
         </div>
       );
+      
+ 
     
     case 'image-only':
       return (
