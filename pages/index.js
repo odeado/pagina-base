@@ -14,7 +14,7 @@ export default function BuiltPage() {
 });
 const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
 const [currentImageIndex, setCurrentImageIndex] = useState(0); // Estado para el índice de la imagen actual
-const [galleryImage, setGalleryImage] = useState(null); // Estado para la imagen de la galería
+const [currentGallery, setCurrentGallery] = useState([]); // Estado para la galería de imágenes
 
 // Refs para el touch
   const touchStartX = useRef(0);
@@ -76,10 +76,10 @@ const [galleryImage, setGalleryImage] = useState(null); // Estado para la imagen
 
 
 // Función para abrir imagen en grande
-   const openImageModal = (img, gallery, index) => {
+    const openImageModal = (img, gallery, index) => {
     setSelectedImage(img);
     setCurrentImageIndex(index);
-    setGalleryImages(gallery);
+    setCurrentGallery(gallery);
   };
 
   // Función para cerrar el modal
@@ -91,15 +91,15 @@ const closeImageModal = () => {
 
  // Funciones para navegación entre imágenes
   const goToPrevious = () => {
-    const newIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+    const newIndex = (currentImageIndex - 1 + currentGallery.length) % currentGallery.length;
     setCurrentImageIndex(newIndex);
-    setSelectedImage(galleryImages[newIndex]);
+    setSelectedImage(currentGallery[newIndex]);
   };
 
   const goToNext = () => {
-    const newIndex = (currentImageIndex + 1) % galleryImages.length;
+    const newIndex = (currentImageIndex + 1) % currentGallery.length;
     setCurrentImageIndex(newIndex);
-    setSelectedImage(galleryImages[newIndex]);
+    setSelectedImage(currentGallery[newIndex]);
   };
 
   // Handlers para touch events
@@ -188,22 +188,18 @@ const closeImageModal = () => {
               {renderSectionContent(section)}
               
               {section.gallery && section.gallery.length > 0 && (
-                <div className={`
-                  ${styles.gallery} 
-                  ${section.layout?.includes('top') ? styles.galleryTop : ''}
-                `}>
-                  {section.gallery.map((img, index) => (
-                    <img 
-                      key={index}
-                      src={img.url} 
-                      alt={img.alt || `Imagen ${index + 1}`}
-                      className={styles.galleryImage}
-                      onClick={() => openImageModal(img, section.gallery, index)}
-                      style={{ cursor: 'pointer' }}
-                    />
-                  ))}
-                </div>
-              )}
+    <div className={styles.gallery}>
+      {section.gallery.map((img, index) => (
+        <img 
+          key={index}
+          src={img.url} 
+          alt={img.alt || `Imagen ${index + 1}`}
+          className={styles.galleryImage}
+          onClick={() => openImageModal(img, section.gallery, index)} // Pasar gallery e index
+        />
+      ))}
+    </div>
+  )}
             </div>
           </section>
         ))}
@@ -242,7 +238,7 @@ const closeImageModal = () => {
             }}>&#10095;</button>
             
             <div className={styles.imageCounter}>
-              {currentImageIndex + 1} / {galleryImages.length}
+              {currentImageIndex + 1} / {currentGallery.length}
             </div>
           </div>
         </div>
