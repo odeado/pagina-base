@@ -410,27 +410,32 @@ export default function AdminPanel() {
     
     setLoading(true);
     try {
-      const { serverTimestamp } = require("firebase/firestore");
-
+      
       const sectionData = {
-        title: section.title,
-        content: section.content,
-        backgroundColor: section.backgroundColor,
-        contentBackground: section.contentBackground,
-        textColor: section.textColor,
-        image: section.image,
-        gallery: section.gallery,
-        layout: section.layout,
-        updatedAt: serverTimestamp(),
-        ...(editingId ? {} : { createdAt: serverTimestamp() })
-      };
-
+      title: section.title,
+      content: section.content,
+      backgroundType: section.backgroundType,
+      backgroundColor: section.backgroundColor,
+      gradientColors: section.gradientColors,
+      gradientDirection: section.gradientDirection,
+      contentBackground: section.contentBackground,
+      textColor: section.textColor,
+      image: section.image,
+      gallery: section.gallery,
+      layout: section.layout,
+      border: section.border,
+      updatedAt: serverTimestamp(),
+    };
 
       if (editingId) {
-        await updateDoc(doc(db, "pageSections", editingId), sectionData);
-      } else {
-        await addDoc(collection(db, "pageSections"), sectionData);
-      }
+      await updateDoc(doc(db, "pageSections", editingId), sectionData);
+    } else {
+      // Para nuevos documentos, añadir createdAt
+      await addDoc(collection(db, "pageSections"), {
+        ...sectionData,
+        createdAt: serverTimestamp()
+      });
+    }
 
       // Reset form
       setSection({
