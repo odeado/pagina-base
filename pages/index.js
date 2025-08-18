@@ -187,28 +187,11 @@ const closeImageModal = () => {
   }}
 >
             <div 
-              className={styles.sectionContent}
-              style={{
-                backgroundColor: section.contentBackground || 'transparent',
-              }}
-            >
-              {section.title && (
-                <h2 
-    className={styles.sectionTitle}
-    style={{
-      fontSize: section.titleStyle?.size === 'h1' ? '2rem' : 
-               section.titleStyle?.size === 'h2' ? '1.5rem' :
-               section.titleStyle?.size === 'h3' ? '1.2rem' : '1rem',
-      textAlign: section.titleStyle?.alignment || 'left',
-      color: section.titleStyle?.color || '#333333',
-      textDecoration: section.titleStyle?.underline ? 'underline' : 'none',
-      fontFamily: section.titleStyle?.fontFamily || 'inherit',
-      margin: '0 0 1rem 0'
-    }}
-  >
-    {section.title}
-  </h2>
-              )}
+               className={styles.sectionContent}
+  style={{
+    backgroundColor: section.contentBackground || 'transparent',
+  }}
+>
 
               {renderSectionContent(section)}
               
