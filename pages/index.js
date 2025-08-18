@@ -13,6 +13,13 @@ export default function BuiltPage() {
   siteTitle: "Mi Sitio Web"
 });
 const [selectedImage, setSelectedImage] = useState(null); // Estado para la imagen seleccionada
+const [currentImageIndex, setCurrentImageIndex] = useState(0); // Estado para el índice de la imagen actual
+const [galleryImage, setGalleryImage] = useState(null); // Estado para la imagen de la galería
+
+// Refs para el touch
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const modalRef = useRef(null);
 
  // Función para cargar las secciones
   const fetchSections = async () => {
@@ -69,16 +76,58 @@ const [selectedImage, setSelectedImage] = useState(null); // Estado para la imag
 
 
 // Función para abrir imagen en grande
-  const openImageModal = (img) => {
+   const openImageModal = (img, gallery, index) => {
     setSelectedImage(img);
+    setCurrentImageIndex(index);
+    setGalleryImages(gallery);
   };
 
   // Función para cerrar el modal
-  const closeImageModal = () => {
+const closeImageModal = () => {
     setSelectedImage(null);
+    setCurrentImageIndex(0);
+    setGalleryImages([]);
   };
 
+ // Funciones para navegación entre imágenes
+  const goToPrevious = () => {
+    const newIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(galleryImages[newIndex]);
+  };
 
+  const goToNext = () => {
+    const newIndex = (currentImageIndex + 1) % galleryImages.length;
+    setCurrentImageIndex(newIndex);
+    setSelectedImage(galleryImages[newIndex]);
+  };
+
+  // Handlers para touch events
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const difference = touchStartX.current - touchEndX.current;
+    
+    if (difference > 50) {
+      // Deslizamiento hacia la izquierda (siguiente imagen)
+      goToNext();
+    } else if (difference < -50) {
+      // Deslizamiento hacia la derecha (imagen anterior)
+      goToPrevious();
+    }
+    
+    // Resetear valores
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
 
 
 
@@ -149,7 +198,7 @@ const [selectedImage, setSelectedImage] = useState(null); // Estado para la imag
                       src={img.url} 
                       alt={img.alt || `Imagen ${index + 1}`}
                       className={styles.galleryImage}
-                      onClick={() => openImageModal(img)}
+                      onClick={() => openImageModal(img, section.gallery, index)}
                       style={{ cursor: 'pointer' }}
                     />
                   ))}
@@ -162,15 +211,39 @@ const [selectedImage, setSelectedImage] = useState(null); // Estado para la imag
 
 
  {/* Modal para imagen en grande */}
-      {selectedImage && (
-        <div className={styles.imageModal} onClick={closeImageModal}>
-          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+           {selectedImage && (
+        <div 
+          className={styles.imageModal} 
+          onClick={closeImageModal}
+          ref={modalRef}
+        >
+          <div 
+            className={styles.modalContent} 
+            onClick={e => e.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <span className={styles.closeButton} onClick={closeImageModal}>&times;</span>
+            <button className={styles.navButtonLeft} onClick={(e) => {
+              e.stopPropagation();
+              goToPrevious();
+            }}>&#10094;</button>
+            
             <img 
               src={selectedImage.url} 
               alt={selectedImage.alt || "Imagen en grande"} 
               className={styles.modalImage}
             />
+            
+            <button className={styles.navButtonRight} onClick={(e) => {
+              e.stopPropagation();
+              goToNext();
+            }}>&#10095;</button>
+            
+            <div className={styles.imageCounter}>
+              {currentImageIndex + 1} / {galleryImages.length}
+            </div>
           </div>
         </div>
       )}
