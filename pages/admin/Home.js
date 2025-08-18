@@ -207,25 +207,55 @@ export default function AdminPanel() {
   };
 
   // Función para comprimir imágenes
-  const compressImage = async (file, maxWidth = 800, quality = 0.7) => {
-    if (!file.type.match('image.*')) {
-      throw new Error("El archivo no es una imagen");
-    }
-    
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = reject;
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onerror = reject;
-        img.onload = () => {
-          // ... resto del código
-        };
-        img.src = event.target.result;
+ const compressImage = async (file, maxWidth = 800, quality = 0.7) => {
+  if (!file.type.match('image.*')) {
+    throw new Error("El archivo no es una imagen");
+  }
+  
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Redimensionar si es necesario
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convertir a formato JPEG con calidad ajustable
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Error al comprimir la imagen"));
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          },
+          'image/jpeg',
+          quality
+        );
       };
-      reader.readAsDataURL(file);
-    });
-  };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+};
 
   const BorderControls = ({ border, onChange }) => {
     return (
