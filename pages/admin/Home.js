@@ -37,7 +37,14 @@ export default function AdminPanel() {
     bottom: false,
     color: "#dddddd",
     width: "1px",
-    style: "solid"
+    style: "solid",
+    titleStyle: {
+    size: "h2", // h1, h2, h3, h4
+    alignment: "left", // left, center, right
+    color: "#333333",
+    fontFamily: "Arial, sans-serif",
+    underline: false
+  }
   }
   });
 
@@ -164,8 +171,62 @@ useEffect(() => {
   fetchSiteSettings();  // Nueva llamada
 }, []);
 
+// Componente para estilos de título
+const TitleStyleControls = ({ style, onChange }) => {
+  return (
+    <div className={styles.titleStyleControls}>
+      <h4>Estilo del título</h4>
+      
+      <div className={styles.formGroup}>
+        <label>Tamaño:</label>
+        <select
+          value={style.size}
+          onChange={(e) => onChange({...style, size: e.target.value})}
+        >
+          <option value="h1">Título 1 (Grande)</option>
+          <option value="h2">Título 2 (Mediano)</option>
+          <option value="h3">Título 3 (Pequeño)</option>
+          <option value="h4">Título 4 (Muy pequeño)</option>
+        </select>
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>Alineación:</label>
+        <select
+          value={style.alignment}
+          onChange={(e) => onChange({...style, alignment: e.target.value})}
+        >
+          <option value="left">Izquierda</option>
+          <option value="center">Centro</option>
+          <option value="right">Derecha</option>
+        </select>
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>Color:</label>
+        <input
+          type="color"
+          value={style.color}
+          onChange={(e) => onChange({...style, color: e.target.value})}
+        />
+      </div>
+      
+      <div className={styles.formGroup}>
+        <label>
+          <input
+            type="checkbox"
+            checked={style.underline}
+            onChange={(e) => onChange({...style, underline: e.target.checked})}
+          />
+          Subrayado
+        </label>
+      </div>
+    </div>
+  );
+};
 
 
+// Componente para gradientes
 const GradientControls = ({ settings, onChange }) => {
   return (
     <div className={styles.gradientControls}>
@@ -277,6 +338,24 @@ const BorderControls = ({ border, onChange }) => {
       )}
     </div>
   );
+};
+
+const sectionStyle = {
+  color: section.textColor,
+  padding: '2rem',
+  margin: '1rem 0',
+  ...(section.backgroundType === 'solid' 
+    ? { backgroundColor: section.backgroundColor }
+    : { 
+        background: `linear-gradient(${section.gradientDirection}, ${section.gradientColors.join(', ')})`
+      }
+  ),
+  ...(section.border.top && {
+    borderTop: `${section.border.width} ${section.border.style} ${section.border.color}`
+  }),
+  ...(section.border.bottom && {
+    borderBottom: `${section.border.width} ${section.border.style} ${section.border.color}`
+  })
 };
 
   // Función para manejar el cambio de logo
@@ -551,7 +630,47 @@ const cancelEdit = () => {
 
 
 
-
+<div className={styles.realTimePreview}>
+  <h3>Vista previa:</h3>
+  <div 
+    className={styles.previewSection}
+    style={{
+      color: section.textColor,
+      backgroundColor: section.backgroundType === 'solid' 
+        ? section.backgroundColor 
+        : `linear-gradient(${section.gradientDirection}, ${section.gradientColors.join(', ')})`,
+      borderTop: section.border.top 
+        ? `${section.border.width} ${section.border.style} ${section.border.color}`
+        : 'none',
+      borderBottom: section.border.bottom 
+        ? `${section.border.width} ${section.border.style} ${section.border.color}`
+        : 'none',
+      padding: '1rem'
+    }}
+  >
+    <h4 
+      style={{
+        fontSize: section.titleStyle.size === 'h1' ? '2rem' : 
+                 section.titleStyle.size === 'h2' ? '1.5rem' :
+                 section.titleStyle.size === 'h3' ? '1.2rem' : '1rem',
+        textAlign: section.titleStyle.alignment,
+        color: section.titleStyle.color,
+        textDecoration: section.titleStyle.underline ? 'underline' : 'none',
+        fontFamily: section.titleStyle.fontFamily
+      }}
+    >
+      {section.title || 'Título de ejemplo'}
+    </h4>
+    <p>{section.content || 'Este es un texto de ejemplo para la vista previa...'}</p>
+    {section.image && (
+      <img 
+        src={section.image} 
+        alt="Preview" 
+        style={{ maxWidth: '100%', height: 'auto' }}
+      />
+    )}
+  </div>
+</div>
 
 {/* Sección del Menú */}
 <div className={styles.menuSection}>
@@ -632,20 +751,43 @@ const cancelEdit = () => {
         </div>
 
 
-   
-
-
-        
-        <div className={styles.colorGroup}>
-          <div className={styles.colorInput}>
-            <label>Color de fondo:</label>
-            <input
-              type="color"
-              value={section.backgroundColor}
-              onChange={(e) => setSection({...section, backgroundColor: e.target.value})}
-            />
-            <span>{section.backgroundColor}</span>
-          </div>
+     <div className={styles.formGroup}>
+        <label>Tipo de fondo:</label>
+    <select
+      value={section.backgroundType}
+      onChange={(e) => setSection({...section, backgroundType: e.target.value})}
+    >
+      <option value="solid">Color sólido</option>
+      <option value="gradient">Degradado</option>
+    </select>
+    
+    {section.backgroundType === "solid" ? (
+      <div className={styles.colorInput}>
+        <label>Color de fondo:</label>
+        <input
+          type="color"
+          value={section.backgroundColor}
+          onChange={(e) => setSection({...section, backgroundColor: e.target.value})}
+        />
+      </div>
+    ) : (
+      <GradientControls 
+        settings={section}
+        onChange={(newSettings) => setSection(newSettings)}
+      />
+    )}
+  </div>
+  
+  <BorderControls 
+    border={section.border}
+    onChange={(newBorder) => setSection({...section, border: newBorder})}
+  />
+  
+  <TitleStyleControls 
+    style={section.titleStyle}
+    onChange={(newStyle) => setSection({...section, titleStyle: newStyle})}
+  />
+          
 
            <div className={styles.colorInput}>
     <label>Color de fondo del contenido:</label>
@@ -666,7 +808,6 @@ const cancelEdit = () => {
             />
             <span>{section.textColor}</span>
           </div>
-        </div>
         
         <div className={styles.formGroup}>
           <label>Imagen principal:</label>
